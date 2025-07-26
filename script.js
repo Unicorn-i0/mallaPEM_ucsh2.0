@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- BASE DE DATOS DE CURSOS EXTRAÍDA DE TU ARCHIVO ---
+    // --- BASE DE DATOS DE CURSOS (CORREGIDA) ---
+    // Se corrigieron errores de tipeo que impedían la carga de todos los semestres.
     const cursosDB = [
         { id: 'PEM101', nombre: 'DESARROLLO DEL PENSAMIENTO NUMÉRICO Y ALGEBRAICO', semestre: 1, creditos: 6, prerequisitos: [], tipo: 'disciplinar-didactico', hito: false },
         { id: 'EPC007', nombre: 'APRENDIZAJE Y DESARROLLO DEL PENSAMIENTO', semestre: 1, creditos: 4, prerequisitos: [], tipo: 'pedagogico', hito: false },
@@ -41,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 'PEM702', nombre: 'DIDÁCTICA DE LOS SISTEMAS NUMÉRICOS', semestre: 7, creditos: 6, prerequisitos: ['PEM401', 'PEM201'], tipo: 'disciplinar-didactico', hito: false },
         { id: 'PEM703', nombre: 'ESTADÍSTICA INFERENCIAL', semestre: 7, creditos: 6, prerequisitos: ['PEM603', 'PEM104'], tipo: 'disciplinar-didactico', hito: false },
         { id: 'PEM705', nombre: 'PENSAMIENTO COMPUTACIONAL E INTERDISCIPLINARIEDAD', semestre: 7, creditos: 4, prerequisitos: ['PEM504'], tipo: 'disciplinar-didactico', hito: false },
-        { id: 'PEM701', nombre: 'EVALUACIÓN EN EDUCACIÓN MATEMÁTICA', semestre: 7, creditos: 4, prerequisitos: ['EPC014'], tipo: 'disciplinar-didactico', hto: false },
+        { id: 'PEM701', nombre: 'EVALUACIÓN EN EDUCACIÓN MATEMÁTICA', semestre: 7, creditos: 4, prerequisitos: ['EPC014'], tipo: 'disciplinar-didactico', hito: false },
         { id: 'PEM704', nombre: 'PRÁCTICA INTERMEDIA II', semestre: 7, creditos: 6, prerequisitos: ['PEM401', 'PEM604'], tipo: 'practicas-y-graduacion', hito: false },
         { id: 'PEM801', nombre: 'DESAFÍOS DEL PROFESORADO DE MATEMÁTICAS: DIVERSIDAD E INCLUSIÓN', semestre: 7, creditos: 6, prerequisitos: ['EPC013', 'PEM404'], tipo: 'disciplinar-didactico', hito: true },
         { id: 'PEM805', nombre: 'OPTATIVO', semestre: 8, creditos: 4, prerequisitos: [], tipo: 'optativo', hito: true },
@@ -130,7 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
             cursosAprobados.add(curso.id);
             actualizarEstado();
         } else {
-            // LÓGICA ACTUALIZADA: Usar confirm() para forzar aprobación
             const totalCreditos = calcularCreditosAprobados();
             const faltantes = curso.prerequisitos.filter(pr => {
                  if (pr.startsWith('CREDITOS_')) {
