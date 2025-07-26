@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Malla Interactiva</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>Malla Curricular Interactiva</h1>
+        <div class="summary">
+            <div>Créditos Aprobados: <span id="creditos-aprobados">0</span></div>
+            <button id="reset-button">Reiniciar Malla</button>
+        </div>
+        <div class="legend">
+            <div class="legend-item"><span class="color-box disciplinar"></span> Disciplinar</div>
+            <div class="legend-item"><span class="color-box pedagogico"></span> Pedagógico</div>
+            <div class="legend-item"><span class="color-box formacion-general"></span> Formación General</div>
+            <div class="legend-item"><span class="color-box optativo"></span> Optativo</div>
+            <div class="legend-item"><span class="color-box hito"></span> Hito Evaluativo</div>
+        </div>
+    </header>
+    <main id="malla-container" class="malla-container">
+        </main>
+    <script src="script.js"></script>
+</body>
+</html>
