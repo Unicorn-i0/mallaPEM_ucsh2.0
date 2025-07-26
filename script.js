@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 'PEM905', nombre: 'OPTATIVO', semestre: 9, creditos: 4, prerequisitos: [], tipo: 'optativo', hito: true },
         { id: 'PEM901', nombre: 'DESAFÍOS DEL PROFESORADO DE MATEMÁTICAS: LIDERAZGO Y CONVIVENCIA', semestre: 9, creditos: 4, prerequisitos: ['PEM404'], tipo: 'disciplinar-didactico', hito: false },
         { id: 'PEM002', nombre: 'PRÁCTICA PROFESIONAL II', semestre: 10, creditos: 16, prerequisitos: ['PEM904'], tipo: 'practicas-y-graduacion', hito: false },
-        { id: 'PEM001', nombre: 'SEMINARIO DE GRADO II', semestre: 10, creditos: 14, prerequisitos: ['PEM902'], tipo: 'practicas-y-graduacion', hito: false },
+        { id: 'PEM001', nombre: 'SEMINARIO DE GRADO II', semestre: 10, creditos: 14, prerequisitos: ['PEM902'], tipo: 'practicas-y-graduacion', hito: false }
     ];
 
     const container = document.getElementById('malla-container');
