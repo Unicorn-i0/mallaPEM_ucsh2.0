@@ -1,11 +1,12 @@
 :root {
-    --color-disciplinar: #d1e7ff; /* Azul claro */
-    --color-pedagogico: #f8d7da;  /* Rojo oscuro/claro */
+    --color-disciplinar: #d1e7ff; /* Azul */
+    --color-pedagogico: #f8d7da;  /* Rojo */
     --color-fg: #fff3cd;         /* Amarillo */
+    --color-practica: #e9d8fd;   /* Morado */
     --color-optativo: #ffffff;   /* Blanco */
-    --color-aprobado: #d4edda;   /* Verde para aprobados */
-    --color-bloqueado: #f0f0f0;  /* Gris para bloqueados */
-    --border-hito: 3px solid #ffd700; /* Borde dorado */
+    --color-aprobado: #d4edda;   /* Verde */
+    --color-bloqueado: #f0f0f0;  /* Gris */
+    --border-hito: 3px solid #ffb703; /* Borde dorado */
     --text-color-dark: #333;
     --text-color-light: #888;
 }
@@ -23,8 +24,9 @@ header {
     margin-bottom: 30px;
 }
 
-h1 {
+h1, h2 {
     color: #2c3e50;
+    margin: 5px 0;
 }
 
 .summary {
@@ -75,6 +77,7 @@ h1 {
 .color-box.disciplinar { background-color: var(--color-disciplinar); }
 .color-box.pedagogico { background-color: var(--color-pedagogico); }
 .color-box.formacion-general { background-color: var(--color-fg); }
+.color-box.practica { background-color: var(--color-practica); }
 .color-box.optativo { background-color: var(--color-optativo); }
 .color-box.hito { border: var(--border-hito); }
 
@@ -83,9 +86,12 @@ h1 {
     grid-auto-flow: column;
     grid-auto-columns: minmax(180px, 1fr);
     gap: 10px;
-    justify-content: start; /* Evita que las columnas se estiren */
-    overflow-x: auto; /* Permite scroll horizontal en pantallas pequeñas */
-    padding-bottom: 20px;
+    justify-content: start;
+    overflow-x: auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
 .semestre-columna {
@@ -101,6 +107,9 @@ h1 {
     background-color: #34495e;
     color: white;
     border-radius: 5px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .curso {
@@ -109,10 +118,13 @@ h1 {
     padding: 12px;
     text-align: center;
     transition: all 0.3s ease;
-    min-height: 100px;
+    min-height: 120px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    position: relative; /* Necesario para la línea */
+    overflow: hidden;   /* Necesario para la línea */
 }
 
 .curso-nombre {
@@ -130,29 +142,43 @@ h1 {
 /* --- ESTILOS DE ESTADO --- */
 .curso.disponible {
     cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 .curso.disponible:hover {
     transform: translateY(-3px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .curso.aprobado {
     background-color: var(--color-aprobado) !important;
     color: #155724;
-    cursor: not-allowed;
+    cursor: pointer;
+}
+
+/* --- NUEVA LÍNEA DIAGONAL PARA CURSOS APROBADOS --- */
+.curso.aprobado::after {
+    content: '';
+    position: absolute;
+    width: 120%;
+    height: 3px;
+    background-color: rgba(231, 76, 60, 0.5); /* Rojo semi-transparente */
+    top: 50%;
+    left: -10%;
+    transform: rotate(-15deg);
+    transform-origin: center center;
+    z-index: 1;
 }
 
 .curso.bloqueado {
     background-color: var(--color-bloqueado);
     color: var(--text-color-light);
-    cursor: not-allowed;
+    cursor: pointer; /* Permitir clic para ver la alerta */
     opacity: 0.7;
 }
 
 /* --- ESTILOS DE TIPO DE CURSO --- */
-.curso.disciplinar { background-color: var(--color-disciplinar); }
+.curso.disciplinar-didactico { background-color: var(--color-disciplinar); }
 .curso.pedagogico { background-color: var(--color-pedagogico); }
 .curso.formacion-general { background-color: var(--color-fg); }
+.curso.practicas-y-graduacion { background-color: var(--color-practica); }
 .curso.optativo { background-color: var(--color-optativo); }
 .curso.hito { border: var(--border-hito); }
