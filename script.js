@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- BASE DE DATOS DE CURSOS ---
-    // Extraído de tu archivo maya.xlsx. Si necesitas cambiar algo, hazlo aquí.
+    // --- BASE DE DATOS DE CURSOS EXTRAÍDA DE TU ARCHIVO ---
     const cursosDB = [
         { id: 'PEM101', nombre: 'DESARROLLO DEL PENSAMIENTO NUMÉRICO Y ALGEBRAICO', semestre: 1, creditos: 6, prerequisitos: [], tipo: 'disciplinar-didactico', hito: false },
         { id: 'EPC007', nombre: 'APRENDIZAJE Y DESARROLLO DEL PENSAMIENTO', semestre: 1, creditos: 4, prerequisitos: [], tipo: 'pedagogico', hito: false },
@@ -64,8 +63,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const resetButton = document.getElementById('reset-button');
     let cursosAprobados = new Set(JSON.parse(localStorage.getItem('cursosAprobados')) || []);
 
+    const calcularCreditosAprobados = () => {
+        return Array.from(cursosAprobados).reduce((acc, id) => {
+            const curso = cursosDB.find(c => c.id === id);
+            return acc + (curso ? curso.creditos : 0);
+        }, 0);
+    };
+
     const renderMalla = () => {
         container.innerHTML = '';
+        const totalCreditos = calcularCreditosAprobados();
+        creditosAprobadosEl.textContent = totalCreditos;
+        
         const maxSemestre = Math.max(...cursosDB.map(c => c.semestre));
         
         for (let i = 1; i <= maxSemestre; i++) {
@@ -77,10 +86,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cursoDiv = document.createElement('div');
                 cursoDiv.classList.add('curso');
                 cursoDiv.dataset.id = curso.id;
+
+                const prerequisitosCumplidos = curso.prerequisitos.every(pr => {
+                    if (pr.startsWith('CREDITOS_')) {
+                        const creditosNecesarios = parseInt(pr.split('_')[1], 10);
+                        return totalCreditos >= creditosNecesarios;
+                    }
+                    return cursosAprobados.has(pr);
+                });
                 
-                const prerequisitosCumplidos = curso.prerequisitos.every(pr => cursosAprobados.has(pr));
-                
-                // Aplicar clases de estado y tipo
                 if (cursosAprobados.has(curso.id)) {
                     cursoDiv.classList.add('aprobado');
                 } else if (prerequisitosCumplidos) {
@@ -104,36 +118,55 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             container.appendChild(semestreColumna);
         }
-        actualizarCreditos();
     };
 
     const toggleAprobacion = (curso, prerequisitosCumplidos) => {
-        if (cursosAprobados.has(curso.id)) {
-            // No se puede des-aprobar para simplificar la lógica
-            return; 
-        }
-
-        if (prerequisitosCumplidos) {
+        const yaAprobado = cursosAprobados.has(curso.id);
+        
+        if (yaAprobado) {
+            cursosAprobados.delete(curso.id);
+            actualizarEstado();
+        } else if (prerequisitosCumplidos) {
             cursosAprobados.add(curso.id);
             actualizarEstado();
+        } else {
+            // LÓGICA ACTUALIZADA: Usar confirm() para forzar aprobación
+            const totalCreditos = calcularCreditosAprobados();
+            const faltantes = curso.prerequisitos.filter(pr => {
+                 if (pr.startsWith('CREDITOS_')) {
+                    const creditosNecesarios = parseInt(pr.split('_')[1], 10);
+                    return totalCreditos < creditosNecesarios;
+                }
+                return !cursosAprobados.has(pr);
+            });
+
+            const nombresFaltantes = faltantes.map(prId => {
+                if (prId.startsWith('CREDITOS_')) {
+                    const creditosNecesarios = prId.split('_')[1];
+                    return `Tener ${creditosNecesarios} créditos aprobados (tienes ${totalCreditos}).`;
+                }
+                const prereqCurso = cursosDB.find(c => c.id === prId);
+                return prereqCurso ? prereqCurso.nombre : prId;
+            });
+
+            if (nombresFaltantes.length > 0) {
+                const mensaje = `Prerrequisitos faltantes para "${curso.nombre}":\n\n• ${nombresFaltantes.join('\n• ')}\n\n¿Deseas marcar el curso como aprobado de todas formas?`;
+                
+                if (confirm(mensaje)) {
+                    cursosAprobados.add(curso.id);
+                    actualizarEstado();
+                }
+            }
         }
     };
 
-    const actualizarCreditos = () => {
-        const totalCreditos = Array.from(cursosAprobados).reduce((acc, id) => {
-            const curso = cursosDB.find(c => c.id === id);
-            return acc + (curso ? curso.creditos : 0);
-        }, 0);
-        creditosAprobadosEl.textContent = totalCreditos;
-    };
-    
     const actualizarEstado = () => {
         localStorage.setItem('cursosAprobados', JSON.stringify(Array.from(cursosAprobados)));
         renderMalla();
     };
 
     resetButton.addEventListener('click', () => {
-        if (confirm('¿Estás seguro de que quieres reiniciar el progreso de la malla?')) {
+        if (confirm('¿Estás seguro de que quieres reiniciar el progreso de la malla? Se borrarán todos los cursos aprobados.')) {
             cursosAprobados.clear();
             actualizarEstado();
         }
