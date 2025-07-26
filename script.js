@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- BASE DE DATOS DE CURSOS ---
     // Extraído de tu archivo maya.xlsx. Si necesitas cambiar algo, hazlo aquí.
     const cursosDB = [
-      { id: 'PEM101', nombre: 'DESARROLLO DEL PENSAMIENTO NUMÉRICO Y ALGEBRAICO', semestre: 1, creditos: 6, prerequisitos: [], tipo: 'disciplinar-didactico', hito: false },
+        { id: 'PEM101', nombre: 'DESARROLLO DEL PENSAMIENTO NUMÉRICO Y ALGEBRAICO', semestre: 1, creditos: 6, prerequisitos: [], tipo: 'disciplinar-didactico', hito: false },
         { id: 'EPC007', nombre: 'APRENDIZAJE Y DESARROLLO DEL PENSAMIENTO', semestre: 1, creditos: 4, prerequisitos: [], tipo: 'pedagogico', hito: false },
         { id: 'CFG001', nombre: 'CURSO FORMACIÓN GENERAL', semestre: 1, creditos: 4, prerequisitos: [], tipo: 'formacion-general', hito: false },
         { id: 'PEM103', nombre: 'DESARROLLO DEL PENSAMIENTO ANALÍTICO', semestre: 1, creditos: 6, prerequisitos: [], tipo: 'disciplinar-didactico', hito: false },
