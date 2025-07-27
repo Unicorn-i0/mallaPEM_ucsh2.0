@@ -38,19 +38,35 @@ h1, h2 {
     font-size: 1.1em;
 }
 
-#reset-button {
+#reset-button,
+#download-pdf-button { /* **ESTILO PARA AMBOS BOTONES (ACTUALIZADO)** */
     padding: 8px 15px;
     border: none;
-    background-color: #e74c3c;
     color: white;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
 }
 
+#reset-button {
+    background-color: #e74c3c;
+}
 #reset-button:hover {
     background-color: #c0392b;
 }
+
+/* **ESTILO PARA EL NUEVO BOTÓN PDF (NUEVO)** */
+#download-pdf-button {
+    background-color: #3498db;
+}
+#download-pdf-button:hover {
+    background-color: #2980b9;
+}
+#download-pdf-button:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+}
+
 
 .legend {
     display: flex;
@@ -123,8 +139,8 @@ h1, h2 {
     flex-direction: column;
     justify-content: space-between;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    position: relative; /* Necesario para la línea */
-    overflow: hidden;   /* Necesario para la línea */
+    position: relative;
+    overflow: hidden;
 }
 
 .curso-nombre {
@@ -139,7 +155,6 @@ h1, h2 {
     margin-top: 8px;
 }
 
-/* --- ESTILOS DE ESTADO --- */
 .curso.disponible {
     cursor: pointer;
 }
@@ -154,13 +169,12 @@ h1, h2 {
     cursor: pointer;
 }
 
-/* --- NUEVA LÍNEA DIAGONAL PARA CURSOS APROBADOS --- */
 .curso.aprobado::after {
     content: '';
     position: absolute;
     width: 120%;
     height: 3px;
-    background-color: rgba(231, 76, 60, 0.5); /* Rojo semi-transparente */
+    background-color: rgba(231, 76, 60, 0.5);
     top: 50%;
     left: -10%;
     transform: rotate(-15deg);
@@ -171,11 +185,10 @@ h1, h2 {
 .curso.bloqueado {
     background-color: var(--color-bloqueado);
     color: var(--text-color-light);
-    cursor: pointer; /* Permitir clic para ver la alerta */
+    cursor: pointer;
     opacity: 0.7;
 }
 
-/* --- ESTILOS DE TIPO DE CURSO --- */
 .curso.disciplinar-didactico { background-color: var(--color-disciplinar); }
 .curso.pedagogico { background-color: var(--color-pedagogico); }
 .curso.formacion-general { background-color: var(--color-fg); }
