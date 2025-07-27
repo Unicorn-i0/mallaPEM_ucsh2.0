@@ -62,34 +62,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const creditosAprobadosEl = document.getElementById('creditos-aprobados');
     const resetButton = document.getElementById('reset-button');
     const downloadPdfButton = document.getElementById('download-pdf-button');
-    
+
     let cursosAprobados = new Set(JSON.parse(localStorage.getItem('cursosAprobados')) || []);
 
-    // ... (El resto de las funciones como calcularCreditosAprobados, renderMalla, etc., no cambian y van aquí)
-    const calcularCreditosAprobados = () => {
-        return Array.from(cursosAprobados).reduce((acc, id) => {
-            const curso = cursosDB.find(c => c.id === id);
-            return acc + (curso ? curso.creditos : 0);
-        }, 0);
-    };
+    const calcularCreditosAprobados = () => Array.from(cursosAprobados).reduce((acc, id) => {
+        const curso = cursosDB.find(c => c.id === id);
+        return acc + (curso ? curso.creditos : 0);
+    }, 0);
 
     const renderMalla = () => {
         container.innerHTML = '';
         const totalCreditos = calcularCreditosAprobados();
         creditosAprobadosEl.textContent = totalCreditos;
-        
         const maxSemestre = Math.max(...cursosDB.map(c => c.semestre));
-        
+
         for (let i = 1; i <= maxSemestre; i++) {
             const semestreColumna = document.createElement('div');
             semestreColumna.classList.add('semestre-columna');
             semestreColumna.innerHTML = `<div class="semestre-titulo">Semestre ${i}</div>`;
-            
             cursosDB.filter(c => c.semestre === i).forEach(curso => {
                 const cursoDiv = document.createElement('div');
                 cursoDiv.classList.add('curso');
                 cursoDiv.dataset.id = curso.id;
-
                 const prerequisitosCumplidos = curso.prerequisitos.every(pr => {
                     if (pr.startsWith('CREDITOS_')) {
                         const creditosNecesarios = parseInt(pr.split('_')[1], 10);
@@ -97,7 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     return cursosAprobados.has(pr);
                 });
-                
                 if (cursosAprobados.has(curso.id)) {
                     cursoDiv.classList.add('aprobado');
                 } else if (prerequisitosCumplidos) {
@@ -105,17 +98,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     cursoDiv.classList.add('bloqueado');
                 }
-
                 cursoDiv.classList.add(curso.tipo.replace(/\s+/g, '-').toLowerCase());
-                if(curso.hito) {
+                if (curso.hito) {
                     cursoDiv.classList.add('hito');
                 }
-                
-                cursoDiv.innerHTML = `
-                    <div class="curso-nombre">${curso.nombre}</div>
-                    <div class="curso-creditos">Créditos: ${curso.creditos}</div>
-                `;
-                
+                cursoDiv.innerHTML = `<div class="curso-nombre">${curso.nombre}</div><div class="curso-creditos">Créditos: ${curso.creditos}</div>`;
                 cursoDiv.addEventListener('click', () => toggleAprobacion(curso, prerequisitosCumplidos));
                 semestreColumna.appendChild(cursoDiv);
             });
@@ -125,7 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const toggleAprobacion = (curso, prerequisitosCumplidos) => {
         const yaAprobado = cursosAprobados.has(curso.id);
-        
         if (yaAprobado) {
             cursosAprobados.delete(curso.id);
             actualizarEstado();
@@ -135,13 +121,12 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             const totalCreditos = calcularCreditosAprobados();
             const faltantes = curso.prerequisitos.filter(pr => {
-                 if (pr.startsWith('CREDITOS_')) {
+                if (pr.startsWith('CREDITOS_')) {
                     const creditosNecesarios = parseInt(pr.split('_')[1], 10);
                     return totalCreditos < creditosNecesarios;
                 }
                 return !cursosAprobados.has(pr);
             });
-
             const nombresFaltantes = faltantes.map(prId => {
                 if (prId.startsWith('CREDITOS_')) {
                     const creditosNecesarios = prId.split('_')[1];
@@ -150,10 +135,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const prereqCurso = cursosDB.find(c => c.id === prId);
                 return prereqCurso ? prereqCurso.nombre : prId;
             });
-
             if (nombresFaltantes.length > 0) {
                 const mensaje = `Prerrequisitos faltantes para "${curso.nombre}":\n\n• ${nombresFaltantes.join('\n• ')}\n\n¿Deseas marcar el curso como aprobado de todas formas?`;
-                
                 if (confirm(mensaje)) {
                     cursosAprobados.add(curso.id);
                     actualizarEstado();
@@ -174,35 +157,64 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- LÓGICA DEL BOTÓN PDF (ACTUALIZADA Y MÁS ROBUSTA) ---
+    // --- LÓGICA DEL BOTÓN PDF (MÉTODO DEFINITIVO) ---
     downloadPdfButton.addEventListener('click', () => {
         downloadPdfButton.disabled = true;
-        downloadPdfButton.textContent = 'Generando PDF...';
+        downloadPdfButton.textContent = 'Preparando captura...';
 
-        // Elemento a capturar
         const malla = document.getElementById('malla-container');
+        const titulos = document.querySelectorAll('.semestre-titulo');
+        const originalBodyStyle = document.body.style.cssText;
+        const originalMallaStyle = malla.style.cssText;
+        const originalTituloStyles = Array.from(titulos).map(t => t.style.cssText);
+
+        // 1. Calcular el ancho y alto real del contenido
+        const scrollWidth = malla.scrollWidth;
+        const scrollHeight = malla.scrollHeight;
         
-        // Se añade la clase al body para aplicar los estilos de "preparación"
-        document.body.classList.add('pdf-generating');
+        // 2. Aplicar estilos temporales para una captura limpia
+        document.body.style.width = scrollWidth + 'px'; // Forzar al body a ser tan ancho como la malla
+        malla.style.overflow = 'visible';
+        malla.style.width = scrollWidth + 'px';
+        malla.style.boxShadow = 'none';
+        titulos.forEach(titulo => titulo.style.position = 'static');
 
-        const options = {
-            margin:       0.4, // Margen en pulgadas
-            filename:     'malla_curricular_progreso.pdf',
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true },
-            // Dejamos que la biblioteca maneje el tamaño de la página, ahora que el elemento no tiene scroll
-            jsPDF:        { unit: 'in', orientation: 'landscape', format: 'legal' }
-        };
+        setTimeout(() => { // Pequeña espera para asegurar que el navegador aplique los estilos
+            downloadPdfButton.textContent = 'Generando PDF...';
 
-        html2pdf().from(malla).set(options).save().finally(() => {
-            // **IMPORTANTE**: Se quita la clase para que la página vuelva a la normalidad
-            document.body.classList.remove('pdf-generating');
-            
-            downloadPdfButton.disabled = false;
-            downloadPdfButton.textContent = 'Descargar PDF';
-        });
+            // 3. Opciones para el PDF
+            const options = {
+                margin: 0,
+                filename: 'malla_curricular_progreso.pdf',
+                image: { type: 'jpeg', quality: 1.0 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    width: scrollWidth,
+                    height: scrollHeight,
+                    windowWidth: scrollWidth,
+                    windowHeight: scrollHeight
+                },
+                // Crear una página PDF con el tamaño exacto de la captura
+                jsPDF: {
+                    unit: 'px',
+                    format: [scrollWidth, scrollHeight],
+                    orientation: 'landscape'
+                }
+            };
+
+            // 4. Generar el PDF y restaurar estilos
+            html2pdf().from(malla).set(options).save().finally(() => {
+                document.body.style.cssText = originalBodyStyle;
+                malla.style.cssText = originalMallaStyle;
+                titulos.forEach((titulo, index) => titulo.style.cssText = originalTituloStyles[index]);
+                
+                downloadPdfButton.disabled = false;
+                downloadPdfButton.textContent = 'Descargar PDF';
+            });
+
+        }, 100); // 100 milisegundos de espera
     });
 
-    // Iniciar la aplicación
     renderMalla();
 });
