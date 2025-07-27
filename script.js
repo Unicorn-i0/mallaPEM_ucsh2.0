@@ -61,7 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('malla-container');
     const creditosAprobadosEl = document.getElementById('creditos-aprobados');
     const resetButton = document.getElementById('reset-button');
-    // **PASO 3.1: OBTENER REFERENCIA AL NUEVO BOTÓN (NUEVO)**
     const downloadPdfButton = document.getElementById('download-pdf-button');
     
     let cursosAprobados = new Set(JSON.parse(localStorage.getItem('cursosAprobados')) || []);
@@ -174,25 +173,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // **PASO 3.2: LÓGICA PARA EL BOTÓN PDF (NUEVO)**
+    // --- LÓGICA DEL BOTÓN PDF (ACTUALIZADA) ---
     downloadPdfButton.addEventListener('click', () => {
-        // Muestra un estado de "cargando" en el botón
         downloadPdfButton.disabled = true;
         downloadPdfButton.textContent = 'Generando PDF...';
 
         const malla = document.getElementById('malla-container');
+        
+        // **LA SOLUCIÓN:** Se mide el ancho real del contenido de la malla.
+        const mallaWidth = malla.scrollWidth;
+        const mallaHeight = malla.scrollHeight;
+        const margin = 40; // Margen en pixeles (se usa la unidad 'pt' que equivale a 1px)
+
         const options = {
-            margin:       0.5,
+            margin:       margin / 2,
             filename:     'malla_curricular_progreso.pdf',
             image:        { type: 'jpeg', quality: 0.98 },
             html2canvas:  { scale: 2, useCORS: true },
-            // La opción 'orientation' en 'landscape' (horizontal) es clave para que quepa la malla.
-            jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
+            // **LA MAGIA:** Se crea un PDF con un formato personalizado al tamaño exacto de la malla.
+            jsPDF:        { unit: 'pt', format: [mallaWidth + margin, mallaHeight + margin], orientation: 'landscape' }
         };
 
-        // Llama a la biblioteca para generar y descargar el PDF
         html2pdf().from(malla).set(options).save().then(() => {
-            // Restaura el botón a su estado original cuando termina
             downloadPdfButton.disabled = false;
             downloadPdfButton.textContent = 'Descargar PDF';
         });
