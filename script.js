@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- BASE DE DATOS DE CURSOS (CORREGIDA) ---
-    // Se corrigieron errores de tipeo que impedían la carga de todos los semestres.
+    // --- BASE DE DATOS DE CURSOS ---
     const cursosDB = [
         { id: 'PEM101', nombre: 'DESARROLLO DEL PENSAMIENTO NUMÉRICO Y ALGEBRAICO', semestre: 1, creditos: 6, prerequisitos: [], tipo: 'disciplinar-didactico', hito: false },
         { id: 'EPC007', nombre: 'APRENDIZAJE Y DESARROLLO DEL PENSAMIENTO', semestre: 1, creditos: 4, prerequisitos: [], tipo: 'pedagogico', hito: false },
@@ -62,6 +61,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('malla-container');
     const creditosAprobadosEl = document.getElementById('creditos-aprobados');
     const resetButton = document.getElementById('reset-button');
+    // **PASO 3.1: OBTENER REFERENCIA AL NUEVO BOTÓN (NUEVO)**
+    const downloadPdfButton = document.getElementById('download-pdf-button');
+    
     let cursosAprobados = new Set(JSON.parse(localStorage.getItem('cursosAprobados')) || []);
 
     const calcularCreditosAprobados = () => {
@@ -170,6 +172,30 @@ document.addEventListener('DOMContentLoaded', () => {
             cursosAprobados.clear();
             actualizarEstado();
         }
+    });
+
+    // **PASO 3.2: LÓGICA PARA EL BOTÓN PDF (NUEVO)**
+    downloadPdfButton.addEventListener('click', () => {
+        // Muestra un estado de "cargando" en el botón
+        downloadPdfButton.disabled = true;
+        downloadPdfButton.textContent = 'Generando PDF...';
+
+        const malla = document.getElementById('malla-container');
+        const options = {
+            margin:       0.5,
+            filename:     'malla_curricular_progreso.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            // La opción 'orientation' en 'landscape' (horizontal) es clave para que quepa la malla.
+            jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
+        };
+
+        // Llama a la biblioteca para generar y descargar el PDF
+        html2pdf().from(malla).set(options).save().then(() => {
+            // Restaura el botón a su estado original cuando termina
+            downloadPdfButton.disabled = false;
+            downloadPdfButton.textContent = 'Descargar PDF';
+        });
     });
 
     // Iniciar la aplicación
