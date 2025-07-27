@@ -65,6 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let cursosAprobados = new Set(JSON.parse(localStorage.getItem('cursosAprobados')) || []);
 
+    // ... (El resto de las funciones como calcularCreditosAprobados, renderMalla, etc., no cambian y van aquí)
     const calcularCreditosAprobados = () => {
         return Array.from(cursosAprobados).reduce((acc, id) => {
             const curso = cursosDB.find(c => c.id === id);
@@ -173,28 +174,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- LÓGICA DEL BOTÓN PDF (ACTUALIZADA) ---
+    // --- LÓGICA DEL BOTÓN PDF (ACTUALIZADA Y MÁS ROBUSTA) ---
     downloadPdfButton.addEventListener('click', () => {
         downloadPdfButton.disabled = true;
         downloadPdfButton.textContent = 'Generando PDF...';
 
+        // Elemento a capturar
         const malla = document.getElementById('malla-container');
         
-        // **LA SOLUCIÓN:** Se mide el ancho real del contenido de la malla.
-        const mallaWidth = malla.scrollWidth;
-        const mallaHeight = malla.scrollHeight;
-        const margin = 40; // Margen en pixeles (se usa la unidad 'pt' que equivale a 1px)
+        // Se añade la clase al body para aplicar los estilos de "preparación"
+        document.body.classList.add('pdf-generating');
 
         const options = {
-            margin:       margin / 2,
+            margin:       0.4, // Margen en pulgadas
             filename:     'malla_curricular_progreso.pdf',
             image:        { type: 'jpeg', quality: 0.98 },
             html2canvas:  { scale: 2, useCORS: true },
-            // **LA MAGIA:** Se crea un PDF con un formato personalizado al tamaño exacto de la malla.
-            jsPDF:        { unit: 'pt', format: [mallaWidth + margin, mallaHeight + margin], orientation: 'landscape' }
+            // Dejamos que la biblioteca maneje el tamaño de la página, ahora que el elemento no tiene scroll
+            jsPDF:        { unit: 'in', orientation: 'landscape', format: 'legal' }
         };
 
-        html2pdf().from(malla).set(options).save().then(() => {
+        html2pdf().from(malla).set(options).save().finally(() => {
+            // **IMPORTANTE**: Se quita la clase para que la página vuelva a la normalidad
+            document.body.classList.remove('pdf-generating');
+            
             downloadPdfButton.disabled = false;
             downloadPdfButton.textContent = 'Descargar PDF';
         });
