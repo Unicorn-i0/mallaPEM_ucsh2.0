@@ -1,197 +1,22 @@
-:root {
-    --color-disciplinar: #d1e7ff; /* Azul */
-    --color-pedagogico: #f8d7da;  /* Rojo */
-    --color-fg: #fff3cd;         /* Amarillo */
-    --color-practica: #e9d8fd;   /* Morado */
-    --color-optativo: #ffffff;   /* Blanco */
-    --color-aprobado: #d4edda;   /* Verde */
-    --color-bloqueado: #f0f0f0;  /* Gris */
-    --border-hito: 3px solid #ffb703; /* Borde dorado */
-    --text-color-dark: #333;
-    --text-color-light: #888;
+/* === ESTILOS TEMPORALES PARA LA GENERACIÓN DEL PDF === */
+/* Esta clase se añade y se quita con JavaScript */
+
+body.pdf-generating .malla-container {
+  /* Obliga a la malla a no tener scroll y a expandirse */
+  overflow-x: visible !important; 
+  display: inline-grid !important; /* Ayuda al motor de renderizado a calcular el ancho real */
+  width: auto !important;
+  box-shadow: none; /* Quita la sombra para un PDF más limpio */
 }
 
-body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #f4f7f9;
-    color: var(--text-color-dark);
-    margin: 0;
-    padding: 20px;
+body.pdf-generating .semestre-titulo {
+  /* Neutraliza el efecto 'sticky' que causa problemas en la captura */
+  position: static !important;
 }
 
-header {
-    text-align: center;
-    margin-bottom: 30px;
+body.pdf-generating header,
+body.pdf-generating #reset-button,
+body.pdf-generating #download-pdf-button {
+  /* Opcional: Oculta los elementos que no queremos en el PDF */
+  display: none !important;
 }
-
-h1, h2 {
-    color: #2c3e50;
-    margin: 5px 0;
-}
-
-.summary {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    margin: 15px 0;
-    font-size: 1.1em;
-}
-
-#reset-button,
-#download-pdf-button { /* **ESTILO PARA AMBOS BOTONES (ACTUALIZADO)** */
-    padding: 8px 15px;
-    border: none;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-#reset-button {
-    background-color: #e74c3c;
-}
-#reset-button:hover {
-    background-color: #c0392b;
-}
-
-/* **ESTILO PARA EL NUEVO BOTÓN PDF (NUEVO)** */
-#download-pdf-button {
-    background-color: #3498db;
-}
-#download-pdf-button:hover {
-    background-color: #2980b9;
-}
-#download-pdf-button:disabled {
-    background-color: #bdc3c7;
-    cursor: not-allowed;
-}
-
-
-.legend {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-top: 20px;
-}
-
-.legend-item {
-    display: flex;
-    align-items: center;
-    font-size: 0.9em;
-}
-
-.color-box {
-    width: 20px;
-    height: 20px;
-    border: 1px solid #ccc;
-    margin-right: 8px;
-    border-radius: 3px;
-}
-
-.color-box.disciplinar { background-color: var(--color-disciplinar); }
-.color-box.pedagogico { background-color: var(--color-pedagogico); }
-.color-box.formacion-general { background-color: var(--color-fg); }
-.color-box.practica { background-color: var(--color-practica); }
-.color-box.optativo { background-color: var(--color-optativo); }
-.color-box.hito { border: var(--border-hito); }
-
-.malla-container {
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(180px, 1fr);
-    gap: 10px;
-    justify-content: start;
-    overflow-x: auto;
-    padding: 20px;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-}
-
-.semestre-columna {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.semestre-titulo {
-    font-weight: bold;
-    text-align: center;
-    padding: 10px;
-    background-color: #34495e;
-    color: white;
-    border-radius: 5px;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-
-.curso {
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 12px;
-    text-align: center;
-    transition: all 0.3s ease;
-    min-height: 120px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    position: relative;
-    overflow: hidden;
-}
-
-.curso-nombre {
-    font-weight: bold;
-    font-size: 0.9em;
-    flex-grow: 1;
-}
-
-.curso-creditos {
-    font-size: 0.8em;
-    color: #555;
-    margin-top: 8px;
-}
-
-.curso.disponible {
-    cursor: pointer;
-}
-.curso.disponible:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.curso.aprobado {
-    background-color: var(--color-aprobado) !important;
-    color: #155724;
-    cursor: pointer;
-}
-
-.curso.aprobado::after {
-    content: '';
-    position: absolute;
-    width: 120%;
-    height: 3px;
-    background-color: rgba(231, 76, 60, 0.5);
-    top: 50%;
-    left: -10%;
-    transform: rotate(-15deg);
-    transform-origin: center center;
-    z-index: 1;
-}
-
-.curso.bloqueado {
-    background-color: var(--color-bloqueado);
-    color: var(--text-color-light);
-    cursor: pointer;
-    opacity: 0.7;
-}
-
-.curso.disciplinar-didactico { background-color: var(--color-disciplinar); }
-.curso.pedagogico { background-color: var(--color-pedagogico); }
-.curso.formacion-general { background-color: var(--color-fg); }
-.curso.practicas-y-graduacion { background-color: var(--color-practica); }
-.curso.optativo { background-color: var(--color-optativo); }
-.curso.hito { border: var(--border-hito); }
