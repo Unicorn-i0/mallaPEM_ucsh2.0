@@ -195,25 +195,3 @@ h1, h2 {
 .curso.practicas-y-graduacion { background-color: var(--color-practica); }
 .curso.optativo { background-color: var(--color-optativo); }
 .curso.hito { border: var(--border-hito); }
-/* === ESTILOS TEMPORALES PARA LA GENERACIÓN DEL PDF === */
-/* Esta clase se añade y se quita con JavaScript */
-
-body.pdf-generating .malla-container {
-  /* Obliga a la malla a no tener scroll y a expandirse */
-  overflow-x: visible !important; 
-  display: inline-grid !important; /* Ayuda al motor de renderizado a calcular el ancho real */
-  width: auto !important;
-  box-shadow: none; /* Quita la sombra para un PDF más limpio */
-}
-
-body.pdf-generating .semestre-titulo {
-  /* Neutraliza el efecto 'sticky' que causa problemas en la captura */
-  position: static !important;
-}
-
-body.pdf-generating header,
-body.pdf-generating #reset-button,
-body.pdf-generating #download-pdf-button {
-  /* Opcional: Oculta los elementos que no queremos en el PDF */
-  display: none !important;
-}
